@@ -1,0 +1,547 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlimited Reels Auto-Responder</title>
+    <style>
+        :root {
+            --primary: #E1306C;
+            --secondary: #C13584;
+            --dark: #262626;
+            --light: #f5f5f5;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: #fafafa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 25px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .form-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(225, 48, 108, 0.2);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(225, 48, 108, 0.3);
+        }
+        
+        .btn-stop {
+            background: linear-gradient(45deg, var(--danger), #ff6b6b);
+        }
+        
+        .btn-clear {
+            background: linear-gradient(45deg, var(--warning), #ffb347);
+        }
+        
+        .status-container {
+            margin-top: 30px;
+        }
+        
+        .status-log {
+            height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-time {
+            color: #666;
+            margin-right: 10px;
+        }
+        
+        .log-success {
+            color: var(--success);
+        }
+        
+        .log-error {
+            color: var(--danger);
+        }
+        
+        .log-info {
+            color: var(--primary);
+        }
+        
+        .log-warning {
+            color: var(--warning);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .reels-list {
+            margin-top: 15px;
+        }
+        
+        .reel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .reel-url {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 15px;
+        }
+        
+        .reel-actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .settings-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .settings-option input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: none;
+                border-left: 3px solid transparent;
+            }
+            
+            .tab.active {
+                border-bottom: none;
+                border-left: 3px solid var(--primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Unlimited Reels Auto-Responder</h1>
+            <p class="subtitle">Automatically respond to comments on unlimited Instagram Reels</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="tabs">
+                <div class="tab active" data-tab="main">Dashboard</div>
+                <div class="tab" data-tab="reels">Reels Manager</div>
+                <div class="tab" data-tab="messages">Message Templates</div>
+                <div class="tab" data-tab="settings">Settings</div>
+                <div class="tab" data-tab="logs">Activity Log</div>
+            </div>
+            
+            <!-- Main Dashboard Tab -->
+            <div id="main-tab" class="tab-content active">
+                <div class="form-section">
+                    <h3>Account Information</h3>
+                    <div class="form-group">
+                        <label for="instagram-username">Instagram Username</label>
+                        <input type="text" id="instagram-username" placeholder="Your Instagram username">
+                    </div>
+                    <div class="form-group">
+                        <label for="instagram-password">Instagram Password</label>
+                        <input type="password" id="instagram-password" placeholder="Your Instagram password">
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Bot Status</h3>
+                    <div id="bot-status" style="padding: 15px; background: #f0f0f0; border-radius: 8px; margin-bottom: 15px;">
+                        Bot is currently <strong>stopped</strong>. Add Reels and start the bot.
+                    </div>
+                    <button id="start-bot" class="btn">Start Auto-Responder</button>
+                    <button id="stop-bot" class="btn btn-stop hidden">Stop Auto-Responder</button>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Quick Stats</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                        <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;" id="reels-count">0</div>
+                            <div>Reels Active</div>
+                        </div>
+                        <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;" id="comments-count">0</div>
+                            <div>Comments Processed</div>
+                        </div>
+                        <div style="background: #fff8e1; padding: 15px; border-radius: 8px; text-align: center;">
+                            <div style="font-size: 24px; font-weight: bold;" id="dms-count">0</div>
+                            <div>DMs Sent</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reels Manager Tab -->
+            <div id="reels-tab" class="tab-content">
+                <div class="form-section">
+                    <h3>Add New Reel</h3>
+                    <div class="form-group">
+                        <label for="new-reel-url">Reel URL</label>
+                        <input type="text" id="new-reel-url" placeholder="Paste Instagram Reel URL here">
+                    </div>
+                    <div class="form-group">
+                        <label for="reel-trigger">Trigger Comment (leave blank to use default)</label>
+                        <input type="text" id="reel-trigger" placeholder="Specific trigger comment for this Reel">
+                    </div>
+                    <button id="add-reel" class="btn">Add Reel to Monitor</button>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Active Reels</h3>
+                    <div class="reels-list" id="reels-list">
+                        <!-- Reels will be added here dynamically -->
+                        <div style="padding: 20px; text-align: center; color: #666;">
+                            No Reels added yet. Add your first Reel above.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Message Templates Tab -->
+            <div id="messages-tab" class="tab-content">
+                <div class="form-section">
+                    <h3>Default Response Message</h3>
+                    <div class="form-group">
+                        <textarea id="default-response" placeholder="Enter your default response message that will be sent via DM">Thanks for your comment! 😊 We appreciate your engagement.</textarea>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Multiple Response Templates</h3>
+                    <div class="form-group">
+                        <label>Add multiple response variations (one per line):</label>
+                        <textarea id="multiple-responses" placeholder="Enter multiple response variations (one per line)"></textarea>
+                    </div>
+                    <div class="settings-option">
+                        <input type="checkbox" id="randomize-responses" checked>
+                        <label for="randomize-responses">Randomize response messages</label>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Response Variables</h3>
+                    <p>You can use these special variables in your messages:</p>
+                    <ul style="margin-top: 10px; margin-left: 20px;">
+                        <li><code>{username}</code> - Commenter's username</li>
+                        <li><code>{reel_url}</code> - URL of the Reel</li>
+                        <li><code>{comment}</code> - The actual comment text</li>
+                        <li><code>{time}</code> - Current time</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="form-section">
+                    <h3>Response Settings</h3>
+                    <div class="form-group">
+                        <label for="response-delay">Delay Between Responses (seconds)</label>
+                        <input type="number" id="response-delay" value="5" min="1" max="60">
+                    </div>
+                    <div class="settings-option">
+                        <input type="checkbox" id="random-delay" checked>
+                        <label for="random-delay">Add random variation to delay (±50%)</label>
+                    </div>
+                    <div class="settings-option">
+                        <input type="checkbox" id="typing-indicator" checked>
+                        <label for="typing-indicator">Show typing indicator before sending DM</label>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3>Advanced Settings</h3>
+                    <div class="settings-option">
+                        <input type="checkbox" id="ignore-duplicates" checked>
+                        <label for="ignore-duplicates">Ignore duplicate comments from same user</label>
+                    </div>
+                    <div class="settings-option">
+                        <input type="checkbox" id="skip-verified" checked>
+                        <label for="skip-verified">Skip verified accounts</label>
+                    </div>
+                    <div class="settings-option">
+                        <input type="checkbox" id="skip-business" checked>
+                        <label for="skip-business">Skip business accounts</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Log Tab -->
+            <div id="logs-tab" class="tab-content">
+                <div class="form-section">
+                    <h3>Activity Log</h3>
+                    <div class="status-log" id="status-log"></div>
+                    <button id="clear-logs" class="btn btn-clear">Clear Logs</button>
+                    <button id="export-logs" class="btn">Export Logs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let botRunning = false;
+        let botInterval;
+        let activeReels = [];
+        let processedComments = new Set();
+        let stats = {
+            reels: 0,
+            comments: 0,
+            dms: 0
+        };
+        
+        // DOM elements
+        const startBtn = document.getElementById('start-bot');
+        const stopBtn = document.getElementById('stop-bot');
+        const addReelBtn = document.getElementById('add-reel');
+        const clearLogsBtn = document.getElementById('clear-logs');
+        const exportLogsBtn = document.getElementById('export-logs');
+        const statusLog = document.getElementById('status-log');
+        const reelsList = document.getElementById('reels-list');
+        
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Helper functions
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString();
+        }
+        
+        function addLog(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `<span class="log-time">[${getCurrentTime()}]</span> ${message}`;
+            statusLog.appendChild(logEntry);
+            statusLog.scrollTop = statusLog.scrollHeight;
+        }
+        
+        function updateStats() {
+            document.getElementById('reels-count').textContent = stats.reels;
+            document.getElementById('comments-count').textContent = stats.comments;
+            document.getElementById('dms-count').textContent = stats.dms;
+        }
+        
+        function validateReelUrl(url) {
+            return url.includes('instagram.com/reel/') || url.includes('instagram.com/p/');
+        }
+        
+        function addReelToList(reel) {
+            if (reelsList.children.length === 1 && reelsList.children[0].textContent.includes('No Reels')) {
+                reelsList.innerHTML = '';
+            }
+            
+            const reelItem = document.createElement('div');
+            reelItem.className = 'reel-item';
+            reelItem.dataset.id = reel.id;
+            
+            reelItem.innerHTML = `
+                <div class="reel-url">${reel.url.substring(0, 50)}...</div>
+                <div class="reel-actions">
+                    <button class="remove-reel" data-id="${reel.id}">Remove</button>
+                </div>
+            `;
+            
+            reelsList.appendChild(reelItem);
+            
+            // Add event listener to remove button
+            reelItem.querySelector('.remove-reel').addEventListener('click', function() {
+                const reelId = this.getAttribute('data-id');
+                removeReel(reelId);
+            });
+        }
+        
+        function removeReel(id) {
+            activeReels = activeReels.filter(reel => reel.id !== id);
+            stats.reels = activeReels.length;
+            updateStats();
+            
+            // Remove from DOM
+            document.querySelector(`.reel-item[data-id="${id}"]`)?.remove();
+            
+            // Show empty message if no reels left
+            if (activeReels.length === 0) {
+                reelsList.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">No Reels added yet. Add your first Reel above.</div>';
+            }
+            
+            addLog(`Removed Reel ${id.substring(0, 6)}... from monitoring`, 'warning');
+        }
+        
+        function processComments() {
+            if (!botRunning) return;
+            
+            // Get settings
+            const delay = parseInt(document.getElementById('response-delay').value) || 5;
+            const randomDelay = document.getElementById('random-delay').checked;
+            const randomizeResponses = document.getElementById('randomize-responses').checked;
+            const defaultResponse = document.getElementById('default-response').
